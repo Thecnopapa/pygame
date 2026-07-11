@@ -5,7 +5,8 @@ from Player import Player
 class Game(object):
     def __init__(self, screen):
         screen.add(self)
-        self.player = Player(pygame.Vector2(self.screen.get_width() / 2, self.screen.get_height() / 2))
+        self.player = Player(pygame.Vector2(self.screen.get_width() / 2, self.screen.get_height() / 2), 
+                             sprite_folder="characters2D/Wraith_01/PNG")
 
     def draw(self):
         if self.screen is not None:
@@ -13,6 +14,7 @@ class Game(object):
 
 
     def update(self):
+        player = self.player.update()
         keys = self.engine.keys
         dt = self.engine.dt
         up = keys[pygame.K_w] or keys[pygame.K_UP]
@@ -22,10 +24,21 @@ class Game(object):
 
 
         if up:
-            self.player.pos.y -= 300 * dt
+            player.pos.y -= 300 * dt
         if down:
-            self.player.pos.y += 300 * dt
+            player.pos.y += 300 * dt
         if left:
-            self.player.pos.x -= 300 * dt
+            player.pos.x -= 300 * dt
+            player.direction = "left"
         if right:
-            self.player.pos.x += 300 * dt
+            player.pos.x += 300 * dt
+            player.direction = "right"
+
+        if up or down or left or right:
+            player.set_stance("walk", duration=None)
+
+
+        if keys[pygame.K_SPACE]:
+            player.set_stance("attack", duration=12)
+
+

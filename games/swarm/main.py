@@ -5,6 +5,8 @@ from Engine import Engine
 from Screen import Screen
 from Game import Game
 
+ART_FOLDER = "../../sprites"
+
 def main():
     engine = Engine()
     screen = Screen(engine, background="black")
