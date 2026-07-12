@@ -34,7 +34,7 @@ class Player(object):
 
     def jump(self, dist, start=8):
 
-        print(f"JUMP (folating={self.floating})")
+        #print(f"JUMP (folating={self.floating})")
         if not self.floating:
             self.jump_speed = start
             self.floating = True
@@ -44,7 +44,7 @@ class Player(object):
 
 
     def gravity(self, dist, platforms=None, gravity = 2):
-        print("Gravity")
+        #print("Gravity")
         if platforms is not None:
             #print(self.rect, self.rect.collidedict(platforms, values=1))
             if self.rect.collidedict(platforms, values=1) is not None:
@@ -65,7 +65,7 @@ class Player(object):
         from main import ART_FOLDER
         
         if force or stance != self.stance:
-            print(self.stance, "-->", stance)
+            #print(self.stance, "-->", stance)
             self.stance = stance
             self.f = 0
             self.duration = duration

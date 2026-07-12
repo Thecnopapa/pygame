@@ -25,7 +25,7 @@ def main():
         screen.tick()
 
         engine.end_frame()
-        print()
+        #print()
 
     engine.quit()
 
