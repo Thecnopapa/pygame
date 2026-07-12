@@ -1,6 +1,6 @@
 import pygame
 
-from Engine import Engine
+from engines import Engine
 
 class Screen(object):
     def __init__(self, engine,  width=1280, height=720, background=None):
