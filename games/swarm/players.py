@@ -1,5 +1,5 @@
 import pygame, os, math
-
+from pygame import Vector2
 
 
 class Player(object):
@@ -12,27 +12,31 @@ class Player(object):
         self.stance = None
         self.direction = "right"
         self.floating = True
-        self.jumping = 0
         self.jump_speed = 0
         self.jump_recovery = 0
         self.going_down = False
+        self.floor = None
 
         # Sprite
         self.size = pygame.Vector2(100, 150)
         self.rect = pygame.Rect(*self.pos, *self.size)
         
         # Animation
-        self.animation_speed = 1
+        self.animation_speed = 0.25
         self.idle_counter=0
         self.f = 0
         self.n_frames=None
         self.stance_duration = 1
         self.stance_folder = None
         self.current_sprites = None
+        self.wait_end=False
 
         # Init
         self.set_stance("idle", force=True)
 
+
+    def centre(self):
+        return Vector2(self.pos.x + self.size.x/2, self.pos.y + self.size.y/2)
 
     def go_down(self):
         if self.going_down is False:
@@ -45,61 +49,80 @@ class Player(object):
         if not self.floating and self.jump_recovery <= 0:
             self.jump_speed = start
             self.floating = True
-            self.pos.y -= dist * self.jump_speed 
-            self.jump_recovery = 60
+            self.jump_recovery = 30
 
 
 
 
     def gravity(self, dist, platforms=None, gravity = 2):
-        #print("Gravity")
+        #print("Gravity", self.jump_speed )
         self.floating = True
         rect_dict = {k: v.rect for k, v in platforms.items()}
+
+
+
         if platforms is not None:
-            center = pygame.Vector2((self.pos.x + (self.rect.x / 2)), (self.pos.y + (self.rect.y / 2)))
-            for key , rect in platforms.items():
-                if self.rect.colliderect(rect):
-                    if key == self.going_down:
+            if not self.floating:
+                platforms = {self.floor: platforms[self.floor]}
+            for key, plat in platforms.items():
+                if self.rect.colliderect(plat.rect):
+                    if key == self.going_down or self.jump_speed > 0:
+                        self.floating = True
+                        print("jumping...")
                         continue
-                    if (platforms[key].rect.y > (self.pos.y + (self.size.y *0.9)) and (platforms[key].rect.x < center.x) or (platforms[key].rect.x + platforms[key].rect.width) > center.x):
-                        print(platforms[key].rect.x, center.x)
-                        if self.going_down is True:
-                            self.pos.y += dist
-                            self.floating = True
-                            self.going_down = key
-                        else:
-                            self.floating = False
-                            self.going_down = False
-                            break
+
+                    if platforms[key].rect.y >= (self.pos.y + (self.size.y *0.9)):
+                        print("above floor")
+                        if (platforms[key].rect.x < self.centre().x) or (platforms[key].rect.x + platforms[key].rect.width) > self.centre().x:
+                            print("in platform")
+                            #print(platforms[key].rect.x, center.x)
+                            if self.going_down is True and plat.passable:
+                                self.pos.y += dist
+                                self.floating = True
+                                self.going_down = key
+                            else:
+                                self.floating = False
+                                self.going_down = False
+                                self.jump_speed = 0
+                                self.floor = key
+                                #print([platforms[key].rect.y > (self.pos.y + (self.size.y *0.9)) , (platforms[key].rect.x < self.centre().x or (platforms[key].rect.x + platforms[key].rect.width) > self.centre().x)])
+                            continue
                             
 
 
 
         if self.floating and self.jump_speed > 0:
-            self.pos.y -= dist * (self.jump_speed - gravity)
-            self.jumping -= self.jump_speed
-            self.jump_speed -= 1
-        else:
-            jumping = 0
+            self.pos.y -= dist * self.jump_speed
+            self.jump_speed -= 0.5
 
-            if self.floating:
-                self.pos.y += dist * gravity
+
+        if self.floating:
+            self.pos.y += dist * gravity
         if self.jump_recovery > 0:
             self.jump_recovery -= 1
 
 
-    def set_stance(self, stance=None, duration=1, force=False):
+    def set_stance(self, stance=None, duration=1, direction="right", force=False, wait_end=False):
         from main import ART_FOLDER
         
-        if force or stance != self.stance:
-            #print(self.stance, "-->", stance)
-            self.stance = stance
-            self.f = 0
-            self.duration = duration
-
-            self.stance_folder = os.path.join(ART_FOLDER, self.sprite_folder, self.stance)
-            self.current_sprites = os.listdir(self.stance_folder)
-            self.n_frames = len(self.current_sprites)
+        print(force, self.wait_end, (stance != self.stance) , (direction != self.direction))
+        if force or not self.wait_end:
+            if (stance != self.stance) or (direction != self.direction):
+                print(self.stance, "-->", stance)
+                self.stance = stance
+                self.f = 0
+                self.duration = duration
+                self.direction = direction
+                self.wait_end = wait_end
+                if not self.wait_end: self.stance_duration =0
+                try:
+                    self.stance_folder = os.path.join(ART_FOLDER, self.sprite_folder, self.stance+f"_{self.direction}")
+                    print(self.stance_folder)
+                    assert os.path.exists(self.stance_folder)
+                except AssertionError:
+                    self.stance_folder = os.path.join(ART_FOLDER, self.sprite_folder, self.stance)
+                self.current_sprites = os.listdir(self.stance_folder)
+                self.n_frames = len(self.current_sprites)
 
         return self
 
@@ -110,23 +133,23 @@ class Player(object):
         if self.stance is None:
             stance = "idle"
 
-
+        #print(self.stance_duration)
 
         if self.sprite_folder is not None:
             try:
                 
-                if self.f  >= self.n_frames:
+                if self.f + (0.5 * self.animation_speed) >= self.n_frames:
                     self.f -= self.n_frames
                     self.stance_duration -= 1
                     if self.stance_duration <= 0:
                         if self.idle_counter >= 5:
-                            self.set_stance("blink")
+                            self.set_stance("idle") # blink
                             self.idle_counter = 0
                         else:
                             self.set_stance("idle")
                             self.idle_counter += 1
                         self.stance_duration  = 1
-                        return self.sprite()
+                        #return self.sprite()
 
                 target_frame = math.floor(self.f % self.n_frames)
 
@@ -134,13 +157,7 @@ class Player(object):
                     if frame_img.split(".")[0].endswith(f"f{target_frame}"):
                         sprite_path = os.path.join(self.stance_folder, frame_img)
                         img = pygame.image.load(sprite_path).convert_alpha()
-                        #print(img)
-                        #rect = img.get_rect()
-                        #print(rect)
-                        #rect.update(rect.height/3, 0, rect.height/1.5, rect.height,)
-                        #print(rect)
-                        #img = img.subsurface(rect)
-                        #print(img)
+
                         return img
             except:
                 raise
@@ -165,20 +182,21 @@ class Player(object):
             rect = sprite.get_rect()
             rect.fit(self.rect)
             self.surface = pygame.transform.scale_by(sprite, self.size.y/rect.height)
-            if self.direction == "left":
-                self.surface = pygame.transform.flip(self.surface, True, False)
+            # if (self.direction == "left") and not self.sprite_folder.endswith("left"):
+            #     print(self.direction == "left" , not self.sprite_folder.endswith("left"))
+            #     self.surface = pygame.transform.flip(self.surface, True, False)
 
         #print(self.rect)
         
         
-        pygame.draw.rect(screen, pygame.Color(255,255,255, a=128),self.rect)
+        #pygame.draw.rect(screen, pygame.Color(255,255,255, a=128),self.rect)
         screen.blit(self.surface, self.rect.move(int(-self.size.x/2.4), 0))
         
 
         self.f += 0.5 * self.animation_speed
 
-        if self.f > 99:
-            self.f = 0
+        if self.f > self.n_frames:
+            self.f = 1
 
         
 

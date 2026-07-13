@@ -1,4 +1,5 @@
 import pygame, json
+from pygame import Vector2
 
 from players import Player
 
@@ -8,8 +9,21 @@ plats_json = {
         "x": "50vw",
         "y": "-20vh",
         "w": "20vw",
-        "h": "10vh"
-    }
+        "h": "1vh"
+    }, 
+    "plat2": {
+        "x": "30vw",
+        "y": "-40vh",
+        "w": "20vw",
+        "h": "1vh"
+    }, 
+    "plat3": {
+        "x": "40vw",
+        "y": "-60vh",
+        "w": "20vw",
+        "h": "1vh"
+    }, 
+
 }
 
 
@@ -41,6 +55,7 @@ class Platform(object):
         start_pos = pygame.Vector2(x, y)
         
         self.fixed = fixed
+        self.passable = passable
 
         self.size = start_size
         self.pos = start_pos
@@ -66,10 +81,11 @@ class Game(object):
     def __init__(self, screen):
         screen.add(self)
         self.player = Player(pygame.Vector2(self.screen.get_width() / 2, self.screen.get_height() / 2), 
-                             sprite_folder="characters2D/Wraith_01/PNG")
+                             #sprite_folder="characters2D/Wraith_01/PNG")
+                             sprite_folder="characters2D/Samurai_01/PNG")
 
         self.platforms = {}
-        self.floor = Platform(self, [self.screen.get_width(), 10], ["0vw", "0vh"], fixed=True)
+        self.floor = Platform(self, [self.screen.get_width(), 10], ["0vw", "0vh"], fixed=True, passable=False)
         
 
         self.platforms["floor"] = self.floor
@@ -100,11 +116,11 @@ class Game(object):
 
 
     def scroll_x(self, dist):
-        self.scroll.x += dist
+        self.scroll.x += dist +40
         for plat in self.platforms.values():
             if not plat.fixed:
                 plat.rect.move_ip(-dist, 0)
-        self.player.pos.x -= dist*2
+        self.player.pos.x -= dist
 
     def update(self):
         player = self.player.update()
@@ -115,41 +131,51 @@ class Game(object):
         left = keys[pygame.K_a] or keys[pygame.K_LEFT]
         right = keys[pygame.K_d] or keys[pygame.K_RIGHT]
         new_stance = player.stance
-
+        direction = player.direction
 
         dist = dt * 300
         
         player.gravity(dist, self.platforms)
 
-        if up:
+        if up or keys[pygame.K_SPACE]:
             player.jump(dist*3)
         elif down:
             player.go_down()
 
         if left:
             player.pos.x -= dist
-            player.direction = "left"
+            direction = "left"
+
         if right:
             player.pos.x += dist
-            player.direction = "right"
+            direction = "right"
 
         if left or right:
             new_stance = "walk"
 
 
-        if keys[pygame.K_SPACE]:
-            new_stance = "attack"
+        # if keys[pygame.K_SPACE]:
+        #     new_stance = "attack"
 
         if keys[pygame.K_q]:
             new_stance = "cast"
 
-        if new_stance != player.stance:
-            player.set_stance(new_stance, duration=1, force = False)
+        player.set_stance(new_stance, duration=1, direction=direction, force = False)
 
-        if player.pos.x >= ((self.screen.get_width() * 0.6) + self.scroll.x):
+
+        pygame.draw.line(self.screen, "green", Vector2((self.screen.get_width() * 0.8), 0), Vector2((self.screen.get_width() * 0.8), self.screen.get_height()))
+        pygame.draw.line(self.screen, "green", Vector2((self.screen.get_width() * 0.2), 0), Vector2((self.screen.get_width() * 0.2), self.screen.get_height()))
+
+        if player.centre().x > (self.screen.get_width() * 0.8):
+            #print("Scrolling right", f"{player.pos.x:.2f} {self.scroll.x:.2f} {(self.screen.get_width() * 0.8):.2f}  {(self.screen.get_width() * 0.8):.2f}")
             self.scroll_x(dist)
-            print("Scrolling right", f"{player.pos.x:.2f} {self.scroll.x:.2f} {(self.screen.get_width() * 0.6):.2f}  {(self.screen.get_width() * 0.6) + self.scroll.x:.2f}")
-            
+        
+        elif player.centre().x  < (self.screen.get_width() * 0.2):
+            #print("Scrolling left", f"{player.pos.x:.2f} {self.scroll.x:.2f} {(self.screen.get_width() * 0.2):.2f}  {(self.screen.get_width() * 0.):.2f}")
+            self.scroll_x(-dist)
+
+
+        
 
 
 
