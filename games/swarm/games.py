@@ -6,9 +6,9 @@ from players import Player
 plats_json = {
     "plat1": {
         "x": "50vw",
-        "y": "10vh",
+        "y": "-20vh",
         "w": "20vw",
-        "h": "10px"
+        "h": "10vh"
     }
 }
 
@@ -17,10 +17,10 @@ def relative_size(screen, value):
     if type(value) is str:
         if value.endswith("vw"):
             value = float(value.replace("vw", ""))
-            value = screen.get_width() - (screen.get_width() * value /100)
+            value = (screen.get_width() * value /100)
         elif value.endswith("vh"):
             value = float(value.replace("vh", ""))
-            value = screen.get_height() - (screen.get_height() * value /100)
+            value = (screen.get_height() * value /100) 
         elif value.endswith("px"):
             value = float(value.replace("px", ""))
         else:
@@ -33,12 +33,15 @@ class Platform(object):
 
         w = relative_size(game.screen, start_size[0])
         h = relative_size(game.screen, start_size[1])
-        x = relative_size(game.screen, start_pos[0])
-        y = relative_size(game.screen, start_pos[1])
+        x = relative_size(game.screen, start_pos[0]) 
+        y = relative_size(game.screen, start_pos[1]) - h + game.screen.get_height() 
+        print(x, y)
 
         start_size = pygame.Vector2(w, h)
         start_pos = pygame.Vector2(x, y)
         
+        self.fixed = fixed
+
         self.size = start_size
         self.pos = start_pos
         self.surface = pygame.Surface(start_size)
@@ -46,6 +49,14 @@ class Platform(object):
         self.rect = self.surface.get_rect()
         self.rect.move_ip(self.pos)
         print(" * New platform with rect:", self.rect)
+
+    def draw(self, screen, game):
+
+        # if not self.fixed:
+        #     self.rect.move_ip(-game.scroll)
+
+        #print(self.rect, game.scroll)
+        screen.blit(self.surface, self.rect)
 
 
 
@@ -58,7 +69,7 @@ class Game(object):
                              sprite_folder="characters2D/Wraith_01/PNG")
 
         self.platforms = {}
-        self.floor = Platform(self, [self.screen.get_width(), 10], [0, self.screen.get_height()-20], fixed=True)
+        self.floor = Platform(self, [self.screen.get_width(), 10], ["0vw", "0vh"], fixed=True)
         
 
         self.platforms["floor"] = self.floor
@@ -77,8 +88,20 @@ class Game(object):
         if self.screen is not None:
             self.player.draw(self.screen)
             self.screen.blit(self.floor.surface, self.floor.rect)
+
+        for plat in self.platforms.values():
+            plat.draw(self.screen, self)
+
+
             #print(self.floor_rect)
 
+
+    def scroll_x(self, dist):
+        self.scroll.x += dist
+        for plat in self.platforms.values():
+            if not plat.fixed:
+                plat.rect.move_ip(-dist, 0)
+        self.player.pos.x -= dist*2
 
     def update(self):
         player = self.player.update()
@@ -93,10 +116,10 @@ class Game(object):
 
         dist = dt * 300
         
-        player.gravity(dist, self.platform_rects())
+        player.gravity(dist, self.platforms)
 
         if up:
-            player.jump(dist)
+            player.jump(dist*3)
 
         if left:
             player.pos.x -= dist
@@ -117,6 +140,11 @@ class Game(object):
 
         if new_stance != player.stance:
             player.set_stance(new_stance, duration=1, force = False)
+
+        if player.pos.x >= ((self.screen.get_width() * 0.6) + self.scroll.x):
+            self.scroll_x(dist)
+            print("Scrolling right", f"{player.pos.x:.2f} {self.scroll.x:.2f} {(self.screen.get_width() * 0.6):.2f}  {(self.screen.get_width() * 0.6) + self.scroll.x:.2f}")
+            
 
 
 

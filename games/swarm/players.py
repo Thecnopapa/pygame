@@ -45,10 +45,17 @@ class Player(object):
 
     def gravity(self, dist, platforms=None, gravity = 2):
         #print("Gravity")
+        self.floating = True
+        rect_dict = {k: v.rect for k, v in platforms.items()}
         if platforms is not None:
-            #print(self.rect, self.rect.collidedict(platforms, values=1))
-            if self.rect.collidedict(platforms, values=1) is not None:
-                self.floating = False
+            center = pygame.Vector2((self.pos.x + (self.rect.x / 2)), (self.pos.y + (self.rect.y / 2)))
+            for col , rect in platforms.items():
+                if self.rect.colliderect(rect):
+                    if (platforms[col].rect.y < (self.pos.y+ (self.size.y*0.9)) and (platforms[col].rect.x < center.x) or (platforms[col].rect.x + platforms[col].rect.width) > center.x):
+                        print(platforms[col].rect.x, center.x)
+                        self.floating = False
+
+
 
         if self.floating and self.jump_speed > 0:
             self.pos.y -= dist * (self.jump_speed - gravity)
@@ -142,8 +149,9 @@ class Player(object):
                 self.surface = pygame.transform.flip(self.surface, True, False)
         #print(self.rect)
         
+        
+        pygame.draw.rect(screen, pygame.Color(255,255,255, a=128),self.rect)
         screen.blit(self.surface, self.rect)
-        #pygame.draw.rect(screen, "cyan",self.rect)
         
 
         self.f += 0.5 * self.animation_speed
