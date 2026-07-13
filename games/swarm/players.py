@@ -14,6 +14,8 @@ class Player(object):
         self.floating = True
         self.jumping = 0
         self.jump_speed = 0
+        self.jump_recovery = 0
+        self.going_down = False
 
         # Sprite
         self.size = pygame.Vector2(100, 150)
@@ -32,13 +34,19 @@ class Player(object):
         self.set_stance("idle", force=True)
 
 
+    def go_down(self):
+        if self.going_down is False:
+            self.going_down=True
+
+
     def jump(self, dist, start=8):
 
-        #print(f"JUMP (folating={self.floating})")
-        if not self.floating:
+        print(f"JUMP (floating={self.floating})", self.jump_recovery)
+        if not self.floating and self.jump_recovery <= 0:
             self.jump_speed = start
             self.floating = True
             self.pos.y -= dist * self.jump_speed 
+            self.jump_recovery = 60
 
 
 
@@ -49,11 +57,21 @@ class Player(object):
         rect_dict = {k: v.rect for k, v in platforms.items()}
         if platforms is not None:
             center = pygame.Vector2((self.pos.x + (self.rect.x / 2)), (self.pos.y + (self.rect.y / 2)))
-            for col , rect in platforms.items():
+            for key , rect in platforms.items():
                 if self.rect.colliderect(rect):
-                    if (platforms[col].rect.y < (self.pos.y+ (self.size.y*0.9)) and (platforms[col].rect.x < center.x) or (platforms[col].rect.x + platforms[col].rect.width) > center.x):
-                        print(platforms[col].rect.x, center.x)
-                        self.floating = False
+                    if key == self.going_down:
+                        continue
+                    if (platforms[key].rect.y > (self.pos.y + (self.size.y *0.9)) and (platforms[key].rect.x < center.x) or (platforms[key].rect.x + platforms[key].rect.width) > center.x):
+                        print(platforms[key].rect.x, center.x)
+                        if self.going_down is True:
+                            self.pos.y += dist
+                            self.floating = True
+                            self.going_down = key
+                        else:
+                            self.floating = False
+                            self.going_down = False
+                            break
+                            
 
 
 
@@ -66,6 +84,8 @@ class Player(object):
 
             if self.floating:
                 self.pos.y += dist * gravity
+        if self.jump_recovery > 0:
+            self.jump_recovery -= 1
 
 
     def set_stance(self, stance=None, duration=1, force=False):
@@ -147,11 +167,12 @@ class Player(object):
             self.surface = pygame.transform.scale_by(sprite, self.size.y/rect.height)
             if self.direction == "left":
                 self.surface = pygame.transform.flip(self.surface, True, False)
+
         #print(self.rect)
         
         
         pygame.draw.rect(screen, pygame.Color(255,255,255, a=128),self.rect)
-        screen.blit(self.surface, self.rect)
+        screen.blit(self.surface, self.rect.move(int(-self.size.x/2.4), 0))
         
 
         self.f += 0.5 * self.animation_speed

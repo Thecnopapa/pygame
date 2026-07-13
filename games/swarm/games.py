@@ -29,7 +29,7 @@ def relative_size(screen, value):
 
 
 class Platform(object):
-    def __init__(self, game, start_size, start_pos, fixed=False):
+    def __init__(self, game, start_size, start_pos, fixed=False, passable=True):
 
         w = relative_size(game.screen, start_size[0])
         h = relative_size(game.screen, start_size[1])
@@ -86,11 +86,14 @@ class Game(object):
 
     def draw(self):
         if self.screen is not None:
-            self.player.draw(self.screen)
             self.screen.blit(self.floor.surface, self.floor.rect)
+            for plat in self.platforms.values():
+                plat.draw(self.screen, self)
 
-        for plat in self.platforms.values():
-            plat.draw(self.screen, self)
+            self.player.draw(self.screen)
+            
+
+
 
 
             #print(self.floor_rect)
@@ -120,6 +123,8 @@ class Game(object):
 
         if up:
             player.jump(dist*3)
+        elif down:
+            player.go_down()
 
         if left:
             player.pos.x -= dist
