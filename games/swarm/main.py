@@ -5,7 +5,7 @@ from engines import Engine
 from screens import Screen
 from games import Game
 
-ART_FOLDER = "../../sprites"
+ART_FOLDER = "assets"
 
 def main():
     engine = Engine()
