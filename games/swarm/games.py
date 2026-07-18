@@ -10,7 +10,7 @@ plats_json = {
         "y": "-20vh",
         "w": "20vw",
         "h": "5vh",
-        "texture":"terrain/floor/grass_01.png",
+        "texture": os.path.join("terrain", "floor", "grass_01.png"),
         "overflow": {
             "top": "100vh"
         }
@@ -120,7 +120,7 @@ class Game(object):
         screen.add(self)
         self.player = Player(pygame.Vector2(self.screen.get_width() / 2, self.screen.get_height() / 2), 
                              #sprite_folder="characters2D/Wraith_01/PNG")
-                             sprite_folder="characters/samurai_01/stances")
+                             sprite_folder=os.path.join("characters", "samurai_01", "stances")
 
         self.platforms = {}
         self.floor = Platform(self, [self.screen.get_width()*2, "5vh"], ["0vw", "0vh"], fixed=[False, False], passable=False, texture="terrain/floor/grass_01.png", overflow={"top": "20vh"})
