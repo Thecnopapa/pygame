@@ -3,7 +3,6 @@ from pygame import Vector2
 
 from players import Player
 
-
 plats_json = {
     "plat1": {
         "x": "50vw",
@@ -58,6 +57,7 @@ def relative_size(reference, value):
 
 class Platform(object):
     def __init__(self, game, start_size, start_pos, fixed=False, passable=True, texture=None, overflow=None):
+        from main import ART_FOLDER
 
         w = relative_size(game.screen, start_size[0])
         h = relative_size(game.screen, start_size[1])
@@ -84,7 +84,6 @@ class Platform(object):
             self.surface = pygame.Surface(start_size)
             self.surface.fill("cyan")
         else:
-            from main import ART_FOLDER
             self.surface = pygame.image.load(os.path.join(ART_FOLDER, texture))
             self.surface = pygame.transform.scale_by(self.surface , self.size.y/(self.surface.get_rect().height + relative_size(self.surface, self.overflow.get("top",0))))
             #self.surface = pygame.transform.scale(self.surface, self.size)

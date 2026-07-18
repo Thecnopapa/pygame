@@ -5,7 +5,7 @@ from engines import Engine
 from screens import Screen
 from games import Game
 
-ART_FOLDER = "assets"
+ART_FOLDER = os.path.join("..", "..", "assets")
 DEBUG = "--debug" in sys.argv
 
 def main():

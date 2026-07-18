@@ -5,8 +5,9 @@ from pygame import Vector2
 
 class Player(object):
     def __init__(self, pos, sprite_folder=None):
+        from main import ART_FOLDER
         # Static
-        self.sprite_folder = sprite_folder
+        self.sprite_folder = os.path.join(ART_FOLDER, sprite_folder)
 
         # Movement
         self.pos = pos
@@ -122,11 +123,11 @@ class Player(object):
                 self.wait_end = wait_end
                 if not wait_end: self.stance_duration =0
                 try:
-                    self.stance_folder = os.path.join(ART_FOLDER, self.sprite_folder, self.stance+f"_{self.direction}")
+                    self.stance_folder = os.path.join(self.sprite_folder, self.stance+f"_{self.direction}")
                     print(self.stance_folder)
                     assert os.path.exists(self.stance_folder)
                 except AssertionError:
-                    self.stance_folder = os.path.join(ART_FOLDER, self.sprite_folder, self.stance)
+                    self.stance_folder = os.path.join(self.sprite_folder, self.stance)
                 self.current_sprites = os.listdir(self.stance_folder)
                 self.n_frames = len(self.current_sprites)
 
