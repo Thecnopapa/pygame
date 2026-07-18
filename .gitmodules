@@ -1,0 +1,3 @@
+[submodule "Jueguito"]
+	path = Jueguito
+	url = git@github.com:raynoski/Jueguito.git
