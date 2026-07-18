@@ -1,4 +1,4 @@
-import pygame
+import pygame, sys, os
 
 
 from engines import Engine
@@ -6,6 +6,7 @@ from screens import Screen
 from games import Game
 
 ART_FOLDER = "assets"
+DEBUG = "--debug" in sys.argv
 
 def main():
     engine = Engine()

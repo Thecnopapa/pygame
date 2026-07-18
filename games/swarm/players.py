@@ -2,6 +2,7 @@ import pygame, os, math
 from pygame import Vector2
 
 
+
 class Player(object):
     def __init__(self, pos, sprite_folder=None):
         # Static
@@ -12,17 +13,19 @@ class Player(object):
         self.stance = None
         self.direction = "right"
         self.floating = True
-        self.jump_speed = 0
+        self.jump_speed = 1
         self.jump_recovery = 0
         self.going_down = False
         self.floor = None
+        self.weight = 1
+        self.sprinting = False
 
         # Sprite
         self.size = pygame.Vector2(100, 150)
         self.rect = pygame.Rect(*self.pos, *self.size)
         
         # Animation
-        self.animation_speed = 0.25
+        self.animation_speed = 0.5
         self.idle_counter=0
         self.f = 0
         self.n_frames=None
@@ -71,16 +74,17 @@ class Player(object):
                         print("jumping...")
                         continue
 
-                    if platforms[key].rect.y >= (self.pos.y + (self.size.y *0.9)):
-                        print("above floor")
-                        if (platforms[key].rect.x < self.centre().x) or (platforms[key].rect.x + platforms[key].rect.width) > self.centre().x:
+                    if plat.rect.y+plat.rect.height >= (self.pos.y + (self.size.y *0.8)):
+                        #print("above floor")
+                        if (plat.rect.x < self.centre().x) or (plat.rect.x + plat.rect.width) > self.centre().x:
                             print("in platform")
                             #print(platforms[key].rect.x, center.x)
                             if self.going_down is True and plat.passable:
-                                self.pos.y += dist
+                                #self.pos.y += dist
                                 self.floating = True
                                 self.going_down = key
                             else:
+                                self.pos.y += plat.rect.y-(self.pos.y + self.size.y)+  (self.size.y*0.1)
                                 self.floating = False
                                 self.going_down = False
                                 self.jump_speed = 0
@@ -97,7 +101,8 @@ class Player(object):
 
 
         if self.floating:
-            self.pos.y += dist * gravity
+            self.pos.y += dist * gravity * self.weight
+
         if self.jump_recovery > 0:
             self.jump_recovery -= 1
 
@@ -105,16 +110,17 @@ class Player(object):
     def set_stance(self, stance=None, duration=1, direction="right", force=False, wait_end=False):
         from main import ART_FOLDER
         
-        print(force, self.wait_end, (stance != self.stance) , (direction != self.direction))
+
+        #print(force, self.wait_end, (stance != self.stance) , (direction != self.direction))
         if force or not self.wait_end:
-            if (stance != self.stance) or (direction != self.direction):
+            if (stance != self.stance) or (direction != self.direction) or self.duration < 0:
                 print(self.stance, "-->", stance)
                 self.stance = stance
                 self.f = 0
                 self.duration = duration
                 self.direction = direction
                 self.wait_end = wait_end
-                if not self.wait_end: self.stance_duration =0
+                if not wait_end: self.stance_duration =0
                 try:
                     self.stance_folder = os.path.join(ART_FOLDER, self.sprite_folder, self.stance+f"_{self.direction}")
                     print(self.stance_folder)
@@ -175,6 +181,7 @@ class Player(object):
 
 
     def draw(self, screen):
+        from main import DEBUG
         #print(self.f, end="\r")
         self.rect.update(*self.pos, *self.size)
         sprite = self.sprite()
@@ -188,12 +195,14 @@ class Player(object):
 
         #print(self.rect)
         
+        if DEBUG:
+            pygame.draw.rect(screen, pygame.Color(255,255,255, a=128),self.rect)
+        screen.blit(self.surface, self.rect.move(int(-self.size.x/4), 0))
         
-        #pygame.draw.rect(screen, pygame.Color(255,255,255, a=128),self.rect)
-        screen.blit(self.surface, self.rect.move(int(-self.size.x/2.4), 0))
-        
-
-        self.f += 0.5 * self.animation_speed
+        multiplier = 1
+        if self.sprinting:
+            multiplier +=1
+        self.f += 0.5 * self.animation_speed * multiplier
 
         if self.f > self.n_frames:
             self.f = 1
