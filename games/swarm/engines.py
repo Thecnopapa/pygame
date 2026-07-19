@@ -24,3 +24,4 @@ class Engine(object):
 
     def quit(self):
         pygame.quit()
+        quit(0)

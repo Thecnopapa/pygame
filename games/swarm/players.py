@@ -181,7 +181,8 @@ class Player(object):
 
 
 
-    def draw(self, screen):
+    def draw(self, game):
+        screen=game.screen
         from main import DEBUG
         #print(self.f, end="\r")
         self.rect.update(*self.pos, *self.size)
@@ -203,6 +204,8 @@ class Player(object):
         multiplier = 1
         if self.sprinting:
             multiplier +=1
+        if game.paused:
+            return
         self.f += 0.5 * self.animation_speed * multiplier
 
         if self.f > self.n_frames:
