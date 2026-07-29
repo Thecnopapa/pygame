@@ -1,7 +1,7 @@
 import pygame
 from utils import *
 from menu import MainMenu
-
+from game import OneLevelGame
 class Engine(object):
     def __init__(self, fps=60, width=1280, height=720):
         pygame.init()
@@ -30,6 +30,9 @@ class Engine(object):
 
     def show_menu(self):
         self.menu.draw()
+
+    def start_game(self, button=None):
+        self.game = OneLevelGame()
 
     def clear(self):
         if self.background is not None:

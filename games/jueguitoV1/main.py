@@ -1,10 +1,6 @@
-import pygame, sys, os
-
-
+from utils import *
 from engine import Engine
 
-ART_FOLDER = os.path.join("..", "..", "Jueguito", "assets")
-DEBUG = "--debug" in sys.argv
 
 def main():
     engine = Engine()

@@ -10,12 +10,13 @@ class MenuButton(object):
         self.text = text
         size = V(self.font.size(self.text))
         if centered:
-            pos.x -= size.x
-            pos.y -= size.y
-
+            pos.x -= size.x/2
+            pos.y -= size.y/2
+            pass
         self.location = Location(p=pos,s=size)
 
         self.rect = self.location.rect()
+        print(self.rect)
 
         self.on_click = on_click
         self.on_hover = on_hover
@@ -64,6 +65,7 @@ class Menu(object):
     def draw(self):
         if self.background is not None:
             self.engine.screen.blit(self.background, self.engine.screen.get_rect())
+
         for button in self.buttons:
             button.check()
             button.draw(self.engine.screen)
@@ -72,11 +74,13 @@ class MainMenu(Menu):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.location = Location(0,0, self.engine.screen.get_width(), self.engine.screen.get_height())
-        self.background = self.location.surface()
-        self.background.fill([0, 0, 0, 128])
+        self.background = pygame.image.load(os.path.join(ART_FOLDER, "backgrounds", "menu", "gdd_portrait.jpeg"))
+        #self.background.fill([0, 255, 255, 128])
         self.background= self.background.convert_alpha()
+        print(self.location)
+        print(self.location.centre())
         
-        self.buttons.append(MenuButton("New Game", V(self.location.centre()[0], self.location.centre()[1]), on_click=None, on_hover=MenuButton.darken, centered=True))
+        self.buttons.append(MenuButton("New Game", self.location.centre(), on_click=self.engine.start_game, on_hover=MenuButton.darken, centered=True))
 
 
 
