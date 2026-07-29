@@ -1,14 +1,14 @@
 
 assets(){
-	cd "${PROJECT_PATH}/Jueguito"
+	cd "${PROJECT_PATH}/jueguito-art"
 }
 
-swarm(){
-	cd "${PROJECT_PATH}/games/swarm"
+game(){
+	cd "${PROJECT_PATH}/games/jueguitoV1"
 }
 
 play(){
-	swarm
+	game
 	python main.py
 }
 
