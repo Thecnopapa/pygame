@@ -1,3 +1,4 @@
 [submodule "jueguito-art"]
 	path = jueguito-art
 	url = git@github.com:raynoski/Jueguito.git
+	branch = main
