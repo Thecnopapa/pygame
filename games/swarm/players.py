@@ -197,9 +197,10 @@ class Player(object):
 
         #print(self.rect)
         
-        if DEBUG:
+        if DEBUG or (sprite is None):
             pygame.draw.rect(screen, pygame.Color(255,255,255, a=128),self.rect)
-        screen.blit(self.surface, self.rect.move(int(-self.size.x/4), 0))
+        if sprite is not None:
+            screen.blit(self.surface, self.rect.move(int(-self.size.x/4), 0))
         
         multiplier = 1
         if self.sprinting:
