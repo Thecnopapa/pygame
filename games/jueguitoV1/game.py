@@ -4,7 +4,7 @@ import levels
 
 class OneLevelGame(object):
     def __init__(self, level):
-        print(" * Inititlising game...")
+        log(1, "Inititlising game...")
         self.level = level
         self.load()
 

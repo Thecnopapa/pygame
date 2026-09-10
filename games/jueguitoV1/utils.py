@@ -9,6 +9,30 @@ print(f"DEBUG={DEBUG}")
 class InvalidVector(Exception):
     pass
 
+
+
+class Log(object):
+    def __call__(self, *args, **kwargs):
+        s = None
+        if type(args[0]) is int:
+            i, args = args[0], args[1:]
+            s = ""
+            if i == 1:
+                s += " *"
+            elif i == 2:
+                s += "   >"
+            elif i == 3:
+                s += "     -"
+            else:
+                s = None
+                args = [i] + list(args)
+        if s is None:
+            print(*args, **kwargs)
+        else:
+            print(s, *args, **kwargs)
+
+log = Log()
+
 class Location(object):
     def __init__(self, x=0, y=0, w=0, h=0, p=None, s=None):
 

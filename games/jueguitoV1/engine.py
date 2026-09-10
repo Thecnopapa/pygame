@@ -4,7 +4,7 @@ from menu import MainMenu
 from game import OneLevelGame
 class Engine(object):
     def __init__(self, fps=60, width=1280, height=720):
-        print(" * Inititlising engine...")
+        log(1, "Inititlising engine...")
         pygame.init()
         self.fps=fps
         self.dt=0
@@ -27,7 +27,7 @@ class Engine(object):
         self.clear()
 
     def tick(self):
-        print(f" * TICK {float(self.clock.get_fps()):3.0f} fps", end="\r")
+        print(f"#TICK {float(self.clock.get_fps()):3.0f} fps", end="\r")
         self.game.tick()
 
     def show_menu(self):

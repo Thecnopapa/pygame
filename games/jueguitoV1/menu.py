@@ -69,7 +69,7 @@ class MenuButton(object):
 
 class Menu(object):
     def __init__(self, engine):
-        print(" * Showing menu...")
+        log(1,"Showing menu...")
         self.engine = engine
         self.background = None
         self.buttons = []

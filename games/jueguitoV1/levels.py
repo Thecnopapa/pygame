@@ -5,7 +5,7 @@ from utils import *
 
 class PlatformLevel(object):
     def __init__(self, config):
-        print(" * Inititlising level...")
+        log(1, "Inititlising level...")
         if type(config) is dict:
             self.config = config
         else:
@@ -17,5 +17,17 @@ class PlatformLevel(object):
         return f"<{self.__class__.__name__}: {self.config.get('name')}>"
 
     def load(self):
-        print(" * Loading level:", self)
-        pass
+        log(1, "Loading level:", self)
+
+        self.load_background()
+        self.load_map()
+        self.load_player()
+
+    def load_background(self):
+        log(2, "Loading background...")
+
+    def load_map(self):
+        log(2, "Loading background...")
+
+    def load_player(self):
+        log(2, "Loading player...")
