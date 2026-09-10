@@ -16,10 +16,21 @@ class MenuButton(object):
         self.location = Location(p=pos,s=size)
 
         self.rect = self.location.rect()
-        print(self.rect)
+        #print(self.rect)
 
-        self.on_click = on_click
-        self.on_hover = on_hover
+        if type(on_click) in [list, tuple]:
+            self.on_click = on_click[0]
+            self.on_click_kwargs = on_click[1]
+        else:
+            self.on_click = on_click
+            self.on_click_kwargs = {}
+
+        if type(on_hover) in [list, tuple]:
+            self.on_hover = on_hover[0]
+            self.on_hover_kwargs = on_hover[1]
+        else:
+            self.on_hover = on_hover
+            self.on_hover_kwargs = {}
 
     def check(self):
         coords = pygame.mouse.get_pos()
@@ -40,15 +51,15 @@ class MenuButton(object):
         screen.blit(text, self.rect)
         self.new_color = None
 
-    def hover(self, *args, **kwargs):
+    def hover(self):
         if self.on_hover is None:
             return
-        return self.on_hover(*args, button=self,  **kwargs)
+        return self.on_hover(button=self, **self.on_hover_kwargs)
 
-    def click(self, *args, **kwargs):
+    def click(self):
         if self.on_click is None:
             return
-        return self.on_click( *args ,button=self, **kwargs)
+        return self.on_click(button=self, **self.on_click_kwargs)
 
     def darken(button):
         button.new_color = [button.color[0]*0.6, button.color[1]*0.6, button.color[2]*0.6]
@@ -58,6 +69,7 @@ class MenuButton(object):
 
 class Menu(object):
     def __init__(self, engine):
+        print(" * Showing menu...")
         self.engine = engine
         self.background = None
         self.buttons = []
@@ -77,10 +89,10 @@ class MainMenu(Menu):
         self.background = pygame.image.load(os.path.join(ART_FOLDER, "backgrounds", "menu", "gdd_portrait.jpeg"))
         #self.background.fill([0, 255, 255, 128])
         self.background= self.background.convert_alpha()
-        print(self.location)
-        print(self.location.centre())
+        #print(self.location)
+        #print(self.location.centre())
         
-        self.buttons.append(MenuButton("New Game", self.location.centre(), on_click=self.engine.start_game, on_hover=MenuButton.darken, centered=True))
+        self.buttons.append(MenuButton("New Game", self.location.centre(), on_click=(self.engine.start_game, {"level":"level1"}), on_hover=MenuButton.darken, centered=True))
 
 
 

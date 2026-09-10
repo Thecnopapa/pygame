@@ -1,0 +1,14 @@
+{
+    "name": "Level 1",
+    "class":"PlatformLevel",
+    "background": "backgrund1.png",
+    "player": {
+        "start_pos": [0, 0],
+        "texture": "samurai_01"
+    },
+    "map": {
+        "mode": "fixed",
+        "platforms": [],
+        "enemies": []
+    }
+}

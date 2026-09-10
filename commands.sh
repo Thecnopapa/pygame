@@ -1,4 +1,8 @@
 
+# VARS
+export PYGAME_DETECT_AVX2=1 
+
+
 assets(){
 	cd "${PROJECT_PATH}/jueguito-art"
 }

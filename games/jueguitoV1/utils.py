@@ -1,9 +1,10 @@
-import pygame, os, sys
+import pygame, os, sys, json
 from pygame import Vector2 as V
 
 ART_FOLDER = os.path.join("..", "..", "jueguito-art", "assets")
 DEBUG = "--debug" in sys.argv
-print(os.listdir(ART_FOLDER))
+print(f"DEBUG={DEBUG}")
+#print(os.listdir(ART_FOLDER))
 
 class InvalidVector(Exception):
     pass
@@ -55,10 +56,10 @@ def fit_surface(surface, target):
     ratio_surface = surface.width / surface.height
     ratio_target = target.w, target.h
 
-    print(ratio_target, ratio_surface)
+    #print(ratio_target, ratio_surface)
     ratio_diff = ratio_target - ratio_surface
 
-    print(ratio_diff)
+    #print(ratio_diff)
     if ratio_diff > 0:
         pass
     elif ratio_diff < 0:

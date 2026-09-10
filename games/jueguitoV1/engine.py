@@ -4,6 +4,7 @@ from menu import MainMenu
 from game import OneLevelGame
 class Engine(object):
     def __init__(self, fps=60, width=1280, height=720):
+        print(" * Inititlising engine...")
         pygame.init()
         self.fps=fps
         self.dt=0
@@ -26,13 +27,14 @@ class Engine(object):
         self.clear()
 
     def tick(self):
+        print(f" * TICK {float(self.clock.get_fps()):3.0f} fps", end="\r")
         self.game.tick()
 
     def show_menu(self):
         self.menu.draw()
 
-    def start_game(self, button=None):
-        self.game = OneLevelGame()
+    def start_game(self, level=None, button=None):
+        self.game = OneLevelGame.from_level(level)
 
     def clear(self):
         if self.background is not None:
